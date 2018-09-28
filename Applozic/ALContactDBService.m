@@ -37,8 +37,8 @@
     
     BOOL success = NO;
     ALDBHandler * dbHandler = [ALDBHandler sharedInstance];
-
-
+    
+    
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"DB_CONTACT" inManagedObjectContext:dbHandler.managedObjectContext];
@@ -75,7 +75,7 @@
 {
     BOOL success = NO;
     ALDBHandler * dbHandler = [ALDBHandler sharedInstance];
-
+    
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"DB_CONTACT" inManagedObjectContext:dbHandler.managedObjectContext];
@@ -128,7 +128,7 @@
     
     BOOL success = NO;
     ALDBHandler * dbHandler = [ALDBHandler sharedInstance];
-
+    
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"DB_CONTACT" inManagedObjectContext:dbHandler.managedObjectContext];
@@ -159,6 +159,11 @@
         }
         if(contact.contactType){
             userContact.contactType = contact.contactType;
+        }
+        if(contact.isFavourite == nil){
+            userContact.isFavourite = [NSNumber numberWithInt:0];
+        }else{
+            userContact.isFavourite = contact.isFavourite;
         }
         userContact.localImageResourceName = contact.localImageResourceName;
         userContact.deletedAtTime = contact.deletedAtTime;
@@ -252,7 +257,11 @@
     contact.deletedAtTime = dbContact.deletedAtTime;
     contact.metadata = [contact getMetaDataDictionary:dbContact.metadata];
     contact.roleType = dbContact.roleType;
-    
+    if(dbContact.isFavourite == nil){
+        contact.isFavourite = [NSNumber numberWithInt:0];
+    }else{
+        contact.isFavourite = dbContact.isFavourite;
+    }
     return contact;
 }
 
@@ -287,7 +296,7 @@
 -(BOOL)addContact:(ALContact *)userContact {
     
     ALDBHandler * dbHandler = [ALDBHandler sharedInstance];
-
+    
     DB_CONTACT* existingContact = [self getContactByKey:@"userId" value:[userContact userId]];
     if (existingContact) {
         return NO;
@@ -313,8 +322,11 @@
     contact.deletedAtTime = userContact.deletedAtTime;
     contact.metadata = userContact.metadata.description;
     contact.roleType = userContact.roleType;
-
-    
+    if(userContact.isFavourite == nil){
+        contact.isFavourite = [NSNumber numberWithInt:0];
+    }else{
+        contact.isFavourite = userContact.isFavourite;
+    }
     NSError *error = nil;
     
     result = [dbHandler.managedObjectContext save:&error];
@@ -353,7 +365,7 @@
     
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"DB_CONTACT" inManagedObjectContext:dbHandler.managedObjectContext];
-
+    
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userId = %@",userDetail.userId];
     [fetchRequest setEntity:entity];
     [fetchRequest setPredicate:predicate];
@@ -371,7 +383,7 @@
         if(![userDetail.unreadCount isEqualToNumber:[NSNumber numberWithInt:0]])
         {
             dbContact.unreadCount = userDetail.unreadCount;
-        }        
+        }
         if(userDetail.displayName)
         {
             dbContact.displayName = userDetail.displayName;
@@ -382,11 +394,15 @@
         dbContact.deletedAtTime = userDetail.deletedAtTime;
         dbContact.metadata = userDetail.metadata.description;
         dbContact.roleType = userDetail.roleType;
-
+        if(userDetail.isFavourite == nil){
+            dbContact.isFavourite = [NSNumber numberWithInt:0];
+        }else{
+            dbContact.isFavourite = userDetail.isFavourite;
+        }
     }
     else
     {
-         // Add contact in DB.
+        // Add contact in DB.
         ALContact * contact = [[ALContact alloc] init];
         contact.userId = userDetail.userId;
         contact.unreadCount = userDetail.unreadCount;
@@ -399,6 +415,11 @@
         contact.deletedAtTime = userDetail.deletedAtTime;
         contact.roleType = userDetail.roleType;
         contact.metadata = userDetail.metadata;
+        if(userDetail.isFavourite == nil){
+            contact.isFavourite = [NSNumber numberWithInt:0];
+        }else{
+            contact.isFavourite = userDetail.isFavourite;
+        }
         [self addContact:contact];
     }
     
@@ -411,7 +432,7 @@
     }
     
     return success;
-
+    
 }
 -(BOOL)updateLastSeenDBUpdate:(ALUserDetail *)userDetail
 {
@@ -451,7 +472,7 @@
 -(NSUInteger)markConversationAsDeliveredAndRead:(NSString*)contactId
 {
     NSArray *messages =  [self getUnreadMessagesForIndividual:contactId];
-
+    
     ALDBHandler * dbHandler = [ALDBHandler sharedInstance];
     for (DB_Message *dbMessage in messages)
     {
@@ -494,7 +515,7 @@
     ALDBHandler * dbHandler = [ALDBHandler sharedInstance];
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"DB_CONTACT" inManagedObjectContext:dbHandler.managedObjectContext];
-
+    
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userId = %@",userId];
     [fetchRequest setEntity:entity];
     [fetchRequest setPredicate:predicate];
@@ -507,7 +528,7 @@
         DB_CONTACT *resultDBContact = [result objectAtIndex:0];
         resultDBContact.block = flag;
     }
-
+    
     NSError *error = nil;
     success = [dbHandler.managedObjectContext save:&error];
     
@@ -593,7 +614,7 @@
     return userList;
 }
 
--(void)updateFilteredContacts:(ALContactsResponse *)contactsResponse 
+-(void)updateFilteredContacts:(ALContactsResponse *)contactsResponse
 {
     NSMutableArray * contactArray = [NSMutableArray new];
     for(ALUserDetail * userDetail in contactsResponse.userDetailList)
@@ -630,10 +651,14 @@
         contact.deletedAtTime = dbContact.deletedAtTime;
         contact.roleType = dbContact.roleType;
         contact.metadata = [contact getMetaDataDictionary:dbContact.metadata];
-        
+        if(dbContact.isFavourite == nil){
+            contact.isFavourite = [NSNumber numberWithInt:0];
+        }else{
+            contact.isFavourite = dbContact.isFavourite;
+        }
         [contactList addObject:contact];
     }
-
+    
     return contactList;
     
 }

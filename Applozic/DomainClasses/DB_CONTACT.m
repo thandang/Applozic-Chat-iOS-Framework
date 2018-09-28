@@ -28,7 +28,13 @@
 @dynamic contactType;
 @dynamic deletedAtTime;
 @dynamic roleType;
+@dynamic isFavourite;
 @dynamic metadata;
 
+- (void)awakeFromInsert
+{
+    [super awakeFromInsert];
+    self.isFavourite = 0;
+}
 
 @end

@@ -43,7 +43,7 @@
     self.deletedAtTime = [JSONString valueForKey:@"deletedAtTime"];
     self.metadata = [JSONString valueForKey:@"metadata"];
     self.roleType = [JSONString valueForKey:@"roleType"];
-    
+    self.isFavourite = [JSONString valueForKey:@"isFavourite"];
 }
 
 -(void)userDetail
@@ -78,6 +78,7 @@
     self.deletedAtTime = [self getNSNumberFromJsonValue:json[@"deletedAtTime"]];
     self.metadata = [[NSMutableDictionary  alloc] initWithDictionary:json[@"metadata"]];
     self.roleType = [self getNSNumberFromJsonValue:json[@"roleType"]];
+    self.isFavourite = [self getNSNumberFromJsonValue:json[@"isFavourite"]];
 }
 
 -(NSString *)getDisplayName

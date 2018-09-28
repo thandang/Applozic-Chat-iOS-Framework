@@ -14,7 +14,7 @@
 
 @implementation ALContactService
 
- ALContactDBService * alContactDBService;
+ALContactDBService * alContactDBService;
 
 -(instancetype)  init{
     self= [super init];
@@ -43,7 +43,7 @@
 //For delting all contacts at once
 
 -(BOOL)purgeAllContact{
-  return  [alContactDBService purgeAllContact];
+    return  [alContactDBService purgeAllContact];
     
 }
 
@@ -65,11 +65,11 @@
 
 -(NSNumber *)getOverallUnreadCountForContact
 {
-   return  [alContactDBService getOverallUnreadCountForContactsFromDB];
+    return  [alContactDBService getOverallUnreadCountForContactsFromDB];
 }
 
 -(BOOL) isContactExist:(NSString *) value{
-   
+    
     DB_CONTACT* contact= [alContactDBService getContactByKey:@"userId" value:value];
     return !(contact.lastSeenAt==nil);
     
@@ -79,7 +79,7 @@
 -(BOOL) updateOrInsert:(ALContact*)contact{
     
     return ([self isContactExist:contact.userId]) ? [self updateContact:contact] : [self addContact:contact];
-
+    
 }
 
 -(void)updateOrInsertListOfContacts:(NSMutableArray *)contacts {
@@ -94,12 +94,12 @@
 
 -(BOOL)addListOfContacts:(NSArray *)contacts{
     return [alContactDBService updateListOfContacts:contacts];
-
+    
 }
 
 -(BOOL)addContact:(ALContact *)userContact{
     return [alContactDBService addContact:userContact];
-
+    
 }
 
 #pragma mark fetching APIS
@@ -109,7 +109,7 @@
 
 {
     return [alContactDBService loadContactByKey:key value:value];
-
+    
 }
 
 #pragma mark fetching OR SAVE with Serevr call...
@@ -142,6 +142,11 @@
     contact.userStatus = dbContact.userStatus;
     contact.deletedAtTime = dbContact.deletedAtTime;
     contact.roleType = dbContact.roleType;
+    if(dbContact.isFavourite == nil){
+        contact.isFavourite = [NSNumber numberWithInt:0];
+    }else{
+        contact.isFavourite = dbContact.isFavourite;
+    }
     contact.metadata = [contact getMetaDataDictionary:dbContact.metadata];
     
     return contact;

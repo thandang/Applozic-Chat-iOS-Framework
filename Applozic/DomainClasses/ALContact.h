@@ -34,6 +34,8 @@
 
 @property (nonatomic,retain) NSNumber *lastSeenAt;
 
+@property (nonatomic, retain) NSNumber *isFavourite;
+
 -(instancetype)initWithDict:(NSDictionary * ) dictionary;
 -(void)populateDataFromDictonary:(NSDictionary *)dict;
 

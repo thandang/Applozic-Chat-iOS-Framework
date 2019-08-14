@@ -4534,7 +4534,7 @@ style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
     }
 
     ALMessageDBService* messageDBService = [[ALMessageDBService alloc]init];
-    [messageDBService updateMessageReplyType:message.key replyType:[NSNumber numberWithInt:AL_A_REPLY]];
+    [messageDBService updateMessageReplyType:message.key replyType:[NSNumber numberWithInt:AL_A_REPLY] hideFlag:NO];
 
 }
 

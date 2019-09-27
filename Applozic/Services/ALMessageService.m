@@ -970,6 +970,7 @@ static ALMessageClientService *alMsgClientService;
 - (void) fetchReplyMessages:(NSMutableArray<NSString *> *) keys withCompletion: (void(^)(NSMutableArray<ALMessage *>* messages))completion{
     if (!keys || keys.count < 1) {
         completion(nil);
+        return;
     }
     ALMessageClientService *messageService = [[ALMessageClientService alloc] init];
     [messageService getMessagesWithkeys:keys withCompletion:^(ALAPIResponse *response, NSError *error) {

@@ -17,6 +17,7 @@
 #import "ALContactDBService.h"
 #import "ALMessageService.h"
 #import "ALUserService.h"
+#import "ALDataNetworkConnection.h"
 
 #define MQTT_TOPIC_STATUS @"status-v2"
 
@@ -145,50 +146,53 @@
             ALPushAssist* assistant = [[ALPushAssist alloc] init];
             ALMessage *alMessage = [[ALMessage alloc] initWithDictonary:[theMessageDict objectForKey:@"message"]];
             
-            if([alMessage isHiddenMessage])
-            {
-                NSLog(@"< HIDDEN MESSAGE RECEIVED >");
-                [ALMessageService getLatestMessageForUser:[ALUserDefaultsHandler getDeviceKeyString]
-                                           withCompletion:^(NSMutableArray *message, NSError *error) { }];
-            }
-            else
-            {
-                NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
-                [dict setObject:[alMessage getNotificationText] forKey:@"alertValue"];
-                [dict setObject:[NSNumber numberWithInt:APP_STATE_BACKGROUND] forKey:@"updateUI"];
-                
-                if(alMessage.groupId){
-                    ALChannelService *channelService = [[ALChannelService alloc] init];
-                    [channelService  getChannelInformation:alMessage.groupId orClientChannelKey:nil withCompletion:^(ALChannel *alChannel) {
-                        
-                        if(alChannel && alChannel.type == OPEN){
-                            if(alMessage.deviceKey && [alMessage.deviceKey isEqualToString:[ALUserDefaultsHandler getDeviceKeyString]]) {
-                                NSLog(@"MQTT : RETURNING,GOT MY message");
-                                return;
-                            }
-                            
-                            [ALMessageService addOpenGroupMessage:alMessage];
-                            if(!assistant.isOurViewOnTop)
-                            {
-                                [assistant assist:alMessage.contactIds and:dict ofUser:alMessage.contactIds];
-                                [dict setObject:@"mqtt" forKey:@"Calledfrom"];
-                            }
-                            else
-                            {
-                                [self.alSyncCallService syncCall:alMessage];
-                                [self.mqttConversationDelegate syncCall:alMessage andMessageList:nil];
-                            }
-                        }else{
-                            
-                            [self syncReceivedMessage: alMessage withNSMutableDictionary:dict];
-                            
-                        }
-                    }];
-                } else{
-                    [self syncReceivedMessage: alMessage withNSMutableDictionary:dict];
+            //            if([alMessage isHiddenMessage])
+            //            {
+            //                NSLog(@"< HIDDEN MESSAGE RECEIVED >");
+            //                [ALMessageService getLatestMessageForUser:[ALUserDefaultsHandler getDeviceKeyString]
+            //                                           withCompletion:^(NSMutableArray *message, NSError *error) { }];
+            //                NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+            //                [dict setObject:[alMessage getNotificationText] forKey:@"alertValue"];
+            //                [dict setObject:[NSNumber numberWithInt:APP_STATE_BACKGROUND] forKey:@"updateUI"];
+            //                [self syncReceivedMessage: alMessage withNSMutableDictionary:dict];
+            //            }
+            //            else
+            //            {
+            NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+            [dict setObject:[alMessage getNotificationText] forKey:@"alertValue"];
+            [dict setObject:[NSNumber numberWithInt:APP_STATE_BACKGROUND] forKey:@"updateUI"];
+            
+            if(alMessage.groupId){
+                ALChannelService *channelService = [[ALChannelService alloc] init];
+                [channelService  getChannelInformation:alMessage.groupId orClientChannelKey:nil withCompletion:^(ALChannel *alChannel) {
                     
-                }
+                    if(alChannel && alChannel.type == OPEN){
+                        if(alMessage.deviceKey && [alMessage.deviceKey isEqualToString:[ALUserDefaultsHandler getDeviceKeyString]]) {
+                            NSLog(@"MQTT : RETURNING,GOT MY message");
+                            return;
+                        }
+                        
+                        [ALMessageService addOpenGroupMessage:alMessage];
+                        if(!assistant.isOurViewOnTop)
+                        {
+                            [assistant assist:alMessage.contactIds and:dict ofUser:alMessage.contactIds];
+                            [dict setObject:@"mqtt" forKey:@"Calledfrom"];
+                        }
+                        else
+                        {   [self.alSyncCallService syncCall:alMessage];
+                            [self.mqttConversationDelegate syncCall:alMessage andMessageList:nil];
+                        }
+                    }else{
+                        
+                        [self syncReceivedMessage: alMessage withNSMutableDictionary:dict];
+                        
+                    }
+                }];
+            } else{
+                [self syncReceivedMessage: alMessage withNSMutableDictionary:dict];
+                
             }
+            //            }
         }
         else if ([type isEqualToString:@"MESSAGE_SENT"] || [type isEqualToString:@"APPLOZIC_02"])
         {
@@ -196,10 +200,16 @@
             ALMessage *alMessage = [[ALMessage alloc] initWithDictonary:message];
             
             NSLog(@"ALMESSAGE's DeviceKey : %@ \n Current DeviceKey : %@", alMessage.deviceKey, [ALUserDefaultsHandler getDeviceKeyString]);
-            if(alMessage.deviceKey && [alMessage.deviceKey isEqualToString:[ALUserDefaultsHandler getDeviceKeyString]]) {
-                NSLog(@"MQTT : RETURNING, SENT_BY_SELF_DEVICE");
-                return;
-            }
+            //            if(alMessage.deviceKey && [alMessage.deviceKey isEqualToString:[ALUserDefaultsHandler getDeviceKeyString]]) {
+            ////                if(alMessage.metadata &&
+            ////                   ([alMessage.metadata[@"paymentStatus"] isEqualToString:@"paymentRejected"] ||
+            ////                    [alMessage.metadata[@"paymentStatus"] isEqualToString: @"paymentAccepted"])){
+            ////                    NSLog(@"DO NOT RETURN");
+            ////                }else {
+            //                    NSLog(@"MQTT : RETURNING, SENT_BY_SELF_DEVICE");
+            //                    return;
+            ////                }
+            //            }
             
             [ALMessageService getMessageSENT:alMessage withCompletion:^(NSMutableArray * messageArray, NSError *error) {
                 
@@ -341,10 +351,10 @@
                 }    @catch (NSException * exp) {
                     NSLog(@"Exception in subscribing channel :: %@", exp.description);
                 }
-            
+                
             }
             if (deviceKey != nil && [deviceKey isEqualToString:[ALUserDefaultsHandler getDeviceKeyString]]) {
-                return;
+                //                return;
             }
             [ALMessageService syncMessageMetaData:[ALUserDefaultsHandler getDeviceKeyString] withCompletion:^(NSMutableArray *message, NSError *error) {
                 
@@ -573,6 +583,20 @@
             [self.mqttConversationDelegate syncCall:alMessage andMessageList:nil];
         }
     }];
+}
+
+-(BOOL)shouldRetry {
+    BOOL isInBackground = [UIApplication sharedApplication].applicationState == UIApplicationStateBackground;
+    return !isInBackground && [ALDataNetworkConnection checkDataNetworkAvailable];
+}
+
+- (void)retryConnection {
+    if (![self shouldRetry]) {
+        return;
+    }
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self subscribeToConversation];
+    });
 }
 
 @end

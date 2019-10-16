@@ -100,14 +100,19 @@
         if ([type isEqualToString:MT_SYNC]) // APPLOZIC_01 //
         {
             [ALUserDefaultsHandler setMsgSyncRequired:YES];
-            [ALMessageService getLatestMessageForUser:[ALUserDefaultsHandler getDeviceKeyString]
-                                       withCompletion:^(NSMutableArray *message, NSError *error) { }];
-            
-            NSLog(@"ALPushNotificationService's SYNC CALL");
-            [dict setObject:(alertValue ? alertValue : @"") forKey:@"alertValue"];
-            
-            [self assitingNotificationMessage:notificationMsg andDictionary:dict];
-            
+            [ALMessageService getLatestMessageForUser:[ALUserDefaultsHandler getDeviceKeyString] withCompletion:^(NSMutableArray *message, NSError *error) {
+                                           NSLog(@"ALPushNotificationService's SYNC CALL");
+                                           [dict setObject:(alertValue ? alertValue : @"") forKey:@"alertValue"];
+                                           [self assitingNotificationMessage:notificationMsg andDictionary:dict];
+                                       }];
+//            [ALMessageService getLatestMessageForUser:[ALUserDefaultsHandler getDeviceKeyString]
+//                                       withCompletion:^(NSMutableArray *message, NSError *error) { }];
+//
+//            NSLog(@"ALPushNotificationService's SYNC CALL");
+//            [dict setObject:(alertValue ? alertValue : @"") forKey:@"alertValue"];
+//
+//            [self assitingNotificationMessage:notificationMsg andDictionary:dict];
+
         }
         else if ([type isEqualToString:@"MESSAGE_SENT"]||[type isEqualToString:@"APPLOZIC_02"])
         {

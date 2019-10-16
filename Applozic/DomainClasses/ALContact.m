@@ -38,6 +38,7 @@
     self.metadata = [dict objectForKey:@"metadata"];
     self.roleType = [dict objectForKey:@"roleType"];
     self.isFavourite = [dict objectForKey:@"isFavourite"];
+    self.contactType = [dict objectForKey:@"contactType"];
 }
 
 -(NSMutableDictionary *)getMetaDataDictionary:(NSString *)string

@@ -464,7 +464,7 @@
 +(NSString *)getMQTTPort
 {
     NSString * kPortNumber = [[NSUserDefaults standardUserDefaults] valueForKey:APPLOZIC_MQTT_PORT];
-    return (kPortNumber && ![kPortNumber isEqualToString:@""]) ? kPortNumber : @"1883";
+    return (kPortNumber && ![kPortNumber isEqualToString:@""]) ? kPortNumber : @"8883";
 }
 
 +(void)setUserTypeId:(short)type

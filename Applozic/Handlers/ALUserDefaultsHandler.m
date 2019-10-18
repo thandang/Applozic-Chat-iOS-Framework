@@ -428,7 +428,7 @@
 +(NSString *)getBASEURL
 {
     NSString * kBaseUrl = [[NSUserDefaults standardUserDefaults] valueForKey:APPLOZIC_BASE_URL];
-    return (kBaseUrl && ![kBaseUrl isEqualToString:@""]) ? kBaseUrl : @"https://apps.applozic.com";
+    return (kBaseUrl && ![kBaseUrl isEqualToString:@""]) ? kBaseUrl : @"https://chat-app.coink.com";
 }
 
 +(void)setMQTTURL:(NSString *)mqttURL
@@ -440,7 +440,7 @@
 +(NSString *)getMQTTURL
 {
     NSString * kMqttUrl = [[NSUserDefaults standardUserDefaults] valueForKey:APPLOZIC_MQTT_URL];
-    return (kMqttUrl && ![kMqttUrl isEqualToString:@""]) ? kMqttUrl : @"apps.applozic.com";
+    return (kMqttUrl && ![kMqttUrl isEqualToString:@""]) ? kMqttUrl : @"chat-app.coink.com";
 }
 
 +(void)setFILEURL:(NSString *)fileURL
@@ -452,7 +452,7 @@
 +(NSString *)getFILEURL
 {
     NSString * kFileUrl = [[NSUserDefaults standardUserDefaults] valueForKey:APPLOZIC_FILE_URL];
-    return (kFileUrl && ![kFileUrl isEqualToString:@""]) ? kFileUrl : @"https://applozic.appspot.com";
+    return (kFileUrl && ![kFileUrl isEqualToString:@""]) ? kFileUrl : @"https://chat-app.coink.com";
 }
 
 +(void)setMQTTPort:(NSString *)portNumber

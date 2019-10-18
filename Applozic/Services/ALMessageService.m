@@ -731,6 +731,7 @@ withAttachmentAtLocation:(NSString *)attachmentLocalPath
     DB_Message *dbMessage =  (DB_Message*)[dbService getMessageByKey:@"key" value:message.key];
     
     dbMessage.fileMetaInfo.blobKeyString = message.fileMeta.blobKey;
+    dbMessage.fileMetaInfo.thumbnailBlobKeyString = message.fileMeta.thumbnailBlobKey;
     dbMessage.fileMetaInfo.contentType = message.fileMeta.contentType;
     dbMessage.fileMetaInfo.createdAtTime = message.fileMeta.createdAtTime;
     dbMessage.fileMetaInfo.key = message.fileMeta.key;
@@ -738,6 +739,7 @@ withAttachmentAtLocation:(NSString *)attachmentLocalPath
     dbMessage.fileMetaInfo.size = message.fileMeta.size;
     dbMessage.fileMetaInfo.suUserKeyString = message.fileMeta.userKey;
     message.fileMetaKey = message.fileMeta.key;
+    message.msgDBObjectId = [dbMessage objectID];
     [[ALDBHandler sharedInstance].managedObjectContext save:nil];
     return message;
 }

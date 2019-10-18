@@ -47,5 +47,12 @@
 
 -(void) getLatestMessageForUser:(NSString *)deviceKeyString  withMetaDataSync :(BOOL) isMetaDataUpdate withCompletion:(void (^)( ALSyncMessageFeed *, NSError *))completion;
 
+
+-(void) downloadImageUrl: (NSString *) blobKey withCompletion:(void(^)(NSString * fileURL, NSError *error)) completion;
+
+-(void) downloadImageThumbnailUrl:(NSString *) url blobKey:(NSString *) blobKey completion:(void(^)(NSString * fileURL, NSError *error)) completion;
+
+-(void) downloadImageThumbnailUrl: (ALMessage *) message withCompletion:(void(^)(NSString * fileURL, NSError *error)) completion __attribute__((deprecated));
+
     
 @end

@@ -987,6 +987,18 @@ NOTIFICATION_DISABLE = 2
     [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
++(BOOL)isS3StorageServiceEnabled
+{
+//    return [[NSUserDefaults standardUserDefaults] boolForKey:S3_STORAGE_SERVICE];
+    return YES;
+}
+
++(void)enableS3StorageService:(BOOL)flag
+{
+    [[NSUserDefaults standardUserDefaults] setBool:flag forKey:S3_STORAGE_SERVICE];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
 +(void) setHideAttachmentsOption:(NSMutableArray*)array{
 
     [[NSUserDefaults standardUserDefaults] setObject:array forKey:HIDE_ATTACHMENT_OPTION];

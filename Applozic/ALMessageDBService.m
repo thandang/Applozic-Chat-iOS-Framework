@@ -533,6 +533,7 @@
     DB_FileMetaInfo * fileMetaInfo = [NSEntityDescription insertNewObjectForEntityForName:@"DB_FileMetaInfo" inManagedObjectContext:theDBHandler.managedObjectContext];
 
     fileMetaInfo.blobKeyString = fileInfo.blobKey;
+    fileMetaInfo.thumbnailBlobKeyString = fileInfo.thumbnailBlobKey;
     fileMetaInfo.contentType = fileInfo.contentType;
     fileMetaInfo.createdAtTime = fileInfo.createdAtTime;
     fileMetaInfo.key = fileInfo.key;
@@ -540,6 +541,7 @@
     fileMetaInfo.size = fileInfo.size;
     fileMetaInfo.suUserKeyString = fileInfo.userKey;
     fileMetaInfo.thumbnailUrl = fileInfo.thumbnailUrl;
+    fileMetaInfo.url = fileInfo.url;
     
     return fileMetaInfo;
 }
@@ -580,6 +582,9 @@
     if(theEntity.fileMetaInfo){
         ALFileMetaInfo * theFileMeta = [ALFileMetaInfo new];
         theFileMeta.blobKey = theEntity.fileMetaInfo.blobKeyString;
+        theFileMeta.thumbnailBlobKey = theEntity.fileMetaInfo.thumbnailBlobKeyString;
+        theFileMeta.thumbnailFilePath = theEntity.fileMetaInfo.thumbnailFilePath;
+        theFileMeta.url = theEntity.fileMetaInfo.url;
         theFileMeta.contentType = theEntity.fileMetaInfo.contentType;
         theFileMeta.createdAtTime = theEntity.fileMetaInfo.createdAtTime;
         theFileMeta.key = theEntity.fileMetaInfo.key;
@@ -599,12 +604,14 @@
     almessage.fileMetaKey = almessage.fileMeta.key;
     
     db_Message.fileMetaInfo.blobKeyString = almessage.fileMeta.blobKey;
+    db_Message.fileMetaInfo.thumbnailBlobKeyString = almessage.fileMeta.thumbnailBlobKey;
     db_Message.fileMetaInfo.contentType = almessage.fileMeta.contentType;
     db_Message.fileMetaInfo.createdAtTime = almessage.fileMeta.createdAtTime;
     db_Message.fileMetaInfo.key = almessage.fileMeta.key;
     db_Message.fileMetaInfo.name = almessage.fileMeta.name;
     db_Message.fileMetaInfo.size = almessage.fileMeta.size;
     db_Message.fileMetaInfo.suUserKeyString = almessage.fileMeta.userKey;
+    db_Message.fileMetaInfo.url = almessage.fileMeta.url;
     [[ALDBHandler sharedInstance].managedObjectContext save:nil];
     
 }

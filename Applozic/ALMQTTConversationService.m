@@ -71,7 +71,7 @@
             [self.session setDelegate:self];
             NSLog(@"MQTT : WAITING_FOR_CONNECT...");
             
-            [self.session connectToHost:MQTT_URL port:[MQTT_PORT intValue] withConnectionHandler:^(MQTTSessionEvent event) {
+            [self.session connectToHost:MQTT_URL port:[MQTT_PORT intValue] usingSSL:YES withConnectionHandler:^(MQTTSessionEvent event) {
                 
                 if (event == MQTTSessionEventConnected)
                 {

@@ -61,4 +61,7 @@
 
 -(void)searchMessageWith: (ALSearchRequest *)request withCompletion: (void (^)(NSMutableArray<ALMessage *> *, NSError *))completion;
 
+-(void) getMessagesWithkeys:(NSMutableArray<NSString *> *) keys
+withCompletion:(void(^)(ALAPIResponse* response, NSError *error))completion;
+
 @end

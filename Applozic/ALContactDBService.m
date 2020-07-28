@@ -1,10 +1,10 @@
-//
-//  ALContactDBService.m
-//  ChatApp
-//
-//  Created by Devashish on 23/10/15.
-//  Copyright © 2015 AppLogic. All rights reserved.
-//
+    //
+    //  ALContactDBService.m
+    //  ChatApp
+    //
+    //  Created by Devashish on 23/10/15.
+    //  Copyright © 2015 AppLogic. All rights reserved.
+    //
 
 #import "ALContactDBService.h"
 #import "ALDBHandler.h"
@@ -19,50 +19,50 @@
 
 - (BOOL)purgeListOfContacts:(NSArray *)contacts {
     BOOL result = NO;
-    
+
     for (ALContact *contact in contacts) {
-        
+
         result = [self purgeContact:contact];
-        
+
         if (!result) {
-            
+
             ALSLog(ALLoggerSeverityInfo, @"Failure to delete the contacts");
             break;
         }
     }
-    
+
     return result;
 }
 
 - (BOOL)purgeContact:(ALContact *)contact {
-    
+
     ALDBHandler * dbHandler = [ALDBHandler sharedInstance];
 
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-    
+
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"DB_CONTACT" inManagedObjectContext:dbHandler.managedObjectContext];
-    
+
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userId = %@",contact.userId];
-    
+
     [fetchRequest setEntity:entity];
-    
+
     [fetchRequest setPredicate:predicate];
-    
+
     NSError *fetchError = nil;
-    
+
     NSArray *result = [dbHandler.managedObjectContext executeFetchRequest:fetchRequest error:&fetchError];
-    
+
     for (DB_CONTACT *userContact in result) {
-        
+
         [dbHandler.managedObjectContext deleteObject:userContact];
     }
-    
+
     NSError *deleteError = [dbHandler saveContext];
     if (deleteError) {
         ALSLog(ALLoggerSeverityError, @" Unable to save managed object context %@, %@", deleteError, deleteError.localizedDescription);
         return NO;
     }
-    
+
     return YES;
 }
 
@@ -71,68 +71,68 @@
     ALDBHandler * dbHandler = [ALDBHandler sharedInstance];
 
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-    
+
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"DB_CONTACT" inManagedObjectContext:dbHandler.managedObjectContext];
-    
+
     [fetchRequest setEntity:entity];
-    
+
     NSError *fetchError = nil;
-    
+
     NSArray *result = [dbHandler.managedObjectContext executeFetchRequest:fetchRequest error:&fetchError];
-    
+
     for (DB_CONTACT *userContact in result) {
-        
+
         [dbHandler.managedObjectContext deleteObject:userContact];
     }
-    
+
     NSError *deleteError = [dbHandler saveContext];
 
     if (deleteError) {
         ALSLog(ALLoggerSeverityError, @"Unable to save managed object context. %@, %@", deleteError, deleteError.localizedDescription);
         return NO;
     }
-    
+
     return YES;
 }
 
 #pragma mark - Update Contacts API -
 
 - (BOOL)updateListOfContacts:(NSArray *)contacts {
-    
+
     BOOL result = NO;
-    
+
     for (ALContact *contact in contacts) {
-        
+
         result = [self updateContact:contact];
 
         if (!result) {
             ALSLog(ALLoggerSeverityInfo, @"Failure to update the contacts %@",contact.userId);
         }
     }
-    
+
     return result;
 }
 
 - (BOOL)updateContact:(ALContact *)contact {
-    
+
     ALDBHandler * dbHandler = [ALDBHandler sharedInstance];
 
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
-    
+
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"DB_CONTACT" inManagedObjectContext:dbHandler.managedObjectContext];
-    
+
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userId = %@",contact.userId];
-    
+
     [fetchRequest setEntity:entity];
-    
+
     [fetchRequest setPredicate:predicate];
-    
+
     NSError *fetchError = nil;
-    
+
     NSArray *result = [dbHandler.managedObjectContext executeFetchRequest:fetchRequest error:&fetchError];
-    
+
     for (DB_CONTACT * userContact in result) {
-        
+
         userContact.userId = contact.userId;
         if(contact.email){
             userContact.email = contact.email;
@@ -146,7 +146,7 @@
         if(contact.contactImageUrl){
             userContact.contactImageUrl = contact.contactImageUrl;
         }
-        
+
         if(contact.unreadCount != nil && [contact.unreadCount  compare:[NSNumber numberWithInt:0]] != NSOrderedSame){
             userContact.unreadCount = contact.unreadCount;
         }
@@ -164,7 +164,7 @@
         if(contact.deletedAtTime){
             userContact.deletedAtTime = contact.deletedAtTime;
         }
-        
+
         userContact.roleType = contact.roleType;
 
         userContact.metadata =  [contact appendMetadataIn:userContact.metadata].description;
@@ -172,20 +172,21 @@
         if(contact.notificationAfterTime && [contact.notificationAfterTime longValue]>0){
             userContact.notificationAfterTime = contact.notificationAfterTime;
         }
+        userContact.status = contact.status;
     }
-    
+
     NSError *error = [dbHandler saveContext];
 
     if (error) {
         ALSLog(ALLoggerSeverityError, @"updateContactFERROR :%@",error);
         return NO;
     }
-    
+
     return YES;
 }
 
 -(BOOL)setUnreadCountDB:(ALContact*)contact{
-    
+
     ALDBHandler * dbHandler = [ALDBHandler sharedInstance];
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"DB_CONTACT" inManagedObjectContext:dbHandler.managedObjectContext];
@@ -240,7 +241,7 @@
     if (cachedContact != nil) {
         return cachedContact;
     }
-    
+
     DB_CONTACT *dbContact = [self getContactByKey:key value:value];
     ALContact *contact = [[ALContact alloc] init];
 
@@ -266,7 +267,7 @@
     contact.metadata = [contact getMetaDataDictionary:dbContact.metadata];
     contact.roleType = dbContact.roleType;
     contact.notificationAfterTime = dbContact.notificationAfterTime;
-    
+    contact.status = dbContact.status;
     return contact;
 }
 
@@ -281,7 +282,7 @@
     [fetchRequest setPredicate:predicate];
     NSError *fetchError = nil;
     NSArray *result = [dbHandler.managedObjectContext executeFetchRequest:fetchRequest error:&fetchError];
-    
+
     if (result.count > 0) {
         DB_CONTACT* dbContact = [result objectAtIndex:0];
         /* ALContact *contact = [[ALContact alloc]init];
@@ -344,7 +345,7 @@
         }
         [userDetailArray addObject:userDetail];
     }
-    
+
     return userDetailArray;
 
 }
@@ -355,35 +356,34 @@
     ob.lastSeenAtTime = lastSeenAt;
     ob.connected =  connected;
     ob.userId = userId;
-    
+
     [self updateUserDetail:ob];
 }
 
 -(BOOL)updateUserDetail:(ALUserDetail *)userDetail
 {
     ALDBHandler * dbHandler = [ALDBHandler sharedInstance];
-    
+
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"DB_CONTACT" inManagedObjectContext:dbHandler.managedObjectContext];
 
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userId = %@",userDetail.userId];
     [fetchRequest setEntity:entity];
     [fetchRequest setPredicate:predicate];
-    
+
     NSError *fetchError = nil;
-    
+
     NSArray *result = [dbHandler.managedObjectContext executeFetchRequest:fetchRequest error:&fetchError];
-    
+
     if(result.count > 0)
     {
-        
         DB_CONTACT * dbContact = [result objectAtIndex:0];
         dbContact.lastSeenAt = userDetail.lastSeenAtTime;
         dbContact.connected = userDetail.connected;
         if(userDetail.unreadCount != nil && [userDetail.unreadCount  compare:[NSNumber numberWithInt:0]] != NSOrderedSame){
             dbContact.unreadCount = userDetail.unreadCount;
         }
-        
+
         if(userDetail.displayName)
         {
             dbContact.displayName = userDetail.displayName;
@@ -394,15 +394,15 @@
         dbContact.deletedAtTime = userDetail.deletedAtTime;
         dbContact.metadata =  [userDetail appendMetadataIn:dbContact.metadata].description;
         dbContact.roleType = userDetail.roleType;
-        
+
         if(userDetail.notificationAfterTime && [userDetail.notificationAfterTime longValue]>0){
             dbContact.notificationAfterTime = userDetail.notificationAfterTime;
         }
-        
+        dbContact.status = userDetail.status;
     }
     else
     {
-        // Add contact in DB.
+            // Add contact in DB.
         ALContact * contact = [[ALContact alloc] init];
         contact.userId = userDetail.userId;
         contact.unreadCount = userDetail.unreadCount;
@@ -415,50 +415,51 @@
         contact.deletedAtTime = userDetail.deletedAtTime;
         contact.roleType = userDetail.roleType;
         contact.metadata = userDetail.metadata;
-        
+
         if(userDetail.notificationAfterTime && [userDetail.notificationAfterTime longValue]>0){
             contact.notificationAfterTime = userDetail.notificationAfterTime;
         }
+        contact.status = userDetail.status;
         [self addContact:contact];
     }
-    
+
     NSError *error = [dbHandler saveContext];
     if (error) {
         ALSLog(ALLoggerSeverityError, @"DB ERROR :%@",error);
         return NO;
     }
-    
+
     return YES;
 
 }
 -(BOOL)updateLastSeenDBUpdate:(ALUserDetail *)userDetail
 {
     ALDBHandler * dbHandler = [ALDBHandler sharedInstance];
-    
+
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"DB_CONTACT" inManagedObjectContext:dbHandler.managedObjectContext];
-    
+
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userId = %@",userDetail.userId];
     [fetchRequest setEntity:entity];
     [fetchRequest setPredicate:predicate];
-    
+
     NSError *fetchError = nil;
-    
+
     NSArray *result = [dbHandler.managedObjectContext executeFetchRequest:fetchRequest error:&fetchError];
-    
+
     if(result.count > 0)
     {
         DB_CONTACT * dbContact = [result objectAtIndex:0];
         dbContact.connected = userDetail.connected;
         dbContact.lastSeenAt = userDetail.lastSeenAtTime;
     }
-    
+
     NSError *error = [dbHandler saveContext];
     if (error) {
         ALSLog(ALLoggerSeverityError, @"DB ERROR :%@",error);
         return NO;
     }
-    
+
     return YES;
 }
 
@@ -482,15 +483,15 @@
 }
 
 - (NSArray *)getUnreadMessagesForIndividual:(NSString *)contactId {
-    
-    //Runs at Opening AND Leaving ChatVC AND Opening MessageList..
+
+        //Runs at Opening AND Leaving ChatVC AND Opening MessageList..
     ALDBHandler * dbHandler = [ALDBHandler sharedInstance];
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"DB_Message" inManagedObjectContext:dbHandler.managedObjectContext];
-    
+
     NSPredicate *predicate;
     NSPredicate *predicate2 = [NSPredicate predicateWithFormat:@"status != %i AND type==%@ ",DELIVERED_AND_READ,@"4"];
-    
+
     if (contactId) {
         NSPredicate *predicate1 = [NSPredicate predicateWithFormat:@"%K=%@",@"contactId",contactId];
         NSPredicate *predicate3 = [NSPredicate predicateWithFormat:@"groupId==%d OR groupId==%@",0,NULL];
@@ -514,10 +515,10 @@
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userId = %@",userId];
     [fetchRequest setEntity:entity];
     [fetchRequest setPredicate:predicate];
-    
+
     NSError *fetchError = nil;
     NSArray *result = [dbHandler.managedObjectContext executeFetchRequest:fetchRequest error:&fetchError];
-    
+
     if(result.count > 0)
     {
         DB_CONTACT *resultDBContact = [result objectAtIndex:0];
@@ -555,20 +556,20 @@
     ALDBHandler * dbHandler = [ALDBHandler sharedInstance];
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"DB_CONTACT" inManagedObjectContext:dbHandler.managedObjectContext];
-    
+
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"userId = %@",userId];
     [fetchRequest setEntity:entity];
     [fetchRequest setPredicate:predicate];
-    
+
     NSError *fetchError = nil;
     NSArray *result = [dbHandler.managedObjectContext executeFetchRequest:fetchRequest error:&fetchError];
-    
+
     if(result.count > 0)
     {
         DB_CONTACT *resultDBContact = [result objectAtIndex:0];
         resultDBContact.blockBy = flag;
     }
-    
+
     NSError *error = [dbHandler saveContext];
     if (error)
     {
@@ -583,11 +584,11 @@
     NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
     NSEntityDescription *entity = [NSEntityDescription entityForName:@"DB_CONTACT" inManagedObjectContext:theDBHandler.managedObjectContext];
     [fetchRequest setEntity:entity];
-    
+
     NSError *error = nil;
     NSArray *array = [theDBHandler.managedObjectContext executeFetchRequest:fetchRequest error:&error];
     NSMutableArray * userList = [[NSMutableArray alloc] init];
-    
+
     if(array.count)
     {
         for(DB_CONTACT *contact in array)
@@ -602,11 +603,11 @@
     {
         ALSLog(ALLoggerSeverityInfo, @"NO BLOCKED USER FOUND");
     }
-    
+
     return userList;
 }
 
--(void)updateFilteredContacts:(ALContactsResponse *)contactsResponse 
+-(void)updateFilteredContacts:(ALContactsResponse *)contactsResponse
 {
     NSMutableArray * contactArray = [NSMutableArray new];
     for(ALUserDetail * userDetail in contactsResponse.userDetailList)
@@ -623,14 +624,14 @@
     ALDBHandler * theDbHandler = [ALDBHandler sharedInstance];
     NSFetchRequest * theRequest = [NSFetchRequest fetchRequestWithEntityName:@"DB_CONTACT"];
     [theRequest setReturnsDistinctResults:YES];
-    
+
     NSMutableArray * contactList = [NSMutableArray new];
     NSArray * theArray = [theDbHandler.managedObjectContext executeFetchRequest:theRequest error:nil];
-    
+
     for (DB_CONTACT * dbContact in theArray)
     {
         ALContact *contact = [[ALContact alloc] init];
-        
+
         contact.userId = dbContact.userId;
         contact.fullName = dbContact.fullName;
         contact.contactNumber = dbContact.contactNumber;
@@ -645,11 +646,10 @@
         contact.roleType = dbContact.roleType;
         contact.metadata = [contact getMetaDataDictionary:dbContact.metadata];
         contact.notificationAfterTime =  dbContact.notificationAfterTime;
+        contact.status = dbContact.status;
         [contactList addObject:contact];
     }
-
     return contactList;
-    
 }
 
 -(NSNumber *)getOverallUnreadCountForContactsFromDB
@@ -692,6 +692,7 @@
     if(updatedContact.notificationAfterTime && [updatedContact.notificationAfterTime longValue]>0){
         originalContact.notificationAfterTime = updatedContact.notificationAfterTime;
     }
+    originalContact.status = updatedContact.status;
     return originalContact;
 }
 
@@ -713,19 +714,19 @@
 -(ALUserDetail *)updateMuteAfterTime:(NSNumber*)notificationAfterTime andUserId:(NSString*)userId
 {
     ALDBHandler * dbHandler = [ALDBHandler sharedInstance];
-    
+
     DB_CONTACT* dbContact = [self getContactByKey:@"userId" value:userId];
-    
+
     if(dbContact){
         dbContact.notificationAfterTime = notificationAfterTime;
         [dbHandler saveContext];
     }
-    
+
     return [self getUserDetailFromDbContact:dbContact];
 }
 
 -(ALUserDetail *)getUserDetailFromDbContact:(DB_CONTACT *)dbContact{
-    
+
     ALUserDetail *userDetail = [[ALUserDetail alloc] init];
     userDetail.userId = dbContact.userId;
     userDetail.contactNumber = dbContact.contactNumber;
@@ -737,6 +738,7 @@
     userDetail.deletedAtTime = dbContact.deletedAtTime;
     userDetail.roleType = dbContact.roleType;
     userDetail.notificationAfterTime =  dbContact.notificationAfterTime;
+    userDetail.status = dbContact.status;
     return userDetail;
 }
 

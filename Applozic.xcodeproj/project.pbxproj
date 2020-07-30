@@ -42,6 +42,10 @@
 		1881CEC621527ABA00325270 /* ALMultimediaData.m in Sources */ = {isa = PBXBuildFile; fileRef = 1881CEC421527AB900325270 /* ALMultimediaData.m */; };
 		1885ADA821AD982600FF06A7 /* ALLinkCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 1885ADA621AD982600FF06A7 /* ALLinkCell.m */; };
 		1885ADA921AD982600FF06A7 /* ALLinkCell.h in Headers */ = {isa = PBXBuildFile; fileRef = 1885ADA721AD982600FF06A7 /* ALLinkCell.h */; };
+		18A0E9B324D2163500AE9CF6 /* ALSearchResultViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 18A0E9B124D2163500AE9CF6 /* ALSearchResultViewController.m */; };
+		18A0E9B424D2163500AE9CF6 /* ALSearchResultViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 18A0E9B224D2163500AE9CF6 /* ALSearchResultViewController.h */; };
+		18A0E9B624D2165000AE9CF6 /* ALSearchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A0E9B524D2165000AE9CF6 /* ALSearchViewModel.swift */; };
+		18A0E9B824D2189600AE9CF6 /* ALCustomSearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A0E9B724D2189500AE9CF6 /* ALCustomSearchBar.swift */; };
 		18A2B2B3228A12C600CE93BC /* ALInternalSettings.h in Headers */ = {isa = PBXBuildFile; fileRef = 18A2B2B1228A12C500CE93BC /* ALInternalSettings.h */; };
 		18A2B2B4228A12C600CE93BC /* ALInternalSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 18A2B2B2228A12C600CE93BC /* ALInternalSettings.m */; };
 		18A2B2B7228A14B100CE93BC /* ALTabViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = 18A2B2B5228A14B000CE93BC /* ALTabViewController.h */; };
@@ -461,6 +465,10 @@
 		1881CEC421527AB900325270 /* ALMultimediaData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ALMultimediaData.m; sourceTree = "<group>"; };
 		1885ADA621AD982600FF06A7 /* ALLinkCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ALLinkCell.m; path = Applozic/Views/ALLinkCell.m; sourceTree = "<group>"; };
 		1885ADA721AD982600FF06A7 /* ALLinkCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ALLinkCell.h; path = Applozic/Views/ALLinkCell.h; sourceTree = "<group>"; };
+		18A0E9B124D2163500AE9CF6 /* ALSearchResultViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ALSearchResultViewController.m; sourceTree = "<group>"; };
+		18A0E9B224D2163500AE9CF6 /* ALSearchResultViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ALSearchResultViewController.h; sourceTree = "<group>"; };
+		18A0E9B524D2165000AE9CF6 /* ALSearchViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ALSearchViewModel.swift; path = Applozic/ALSearchViewModel.swift; sourceTree = "<group>"; };
+		18A0E9B724D2189500AE9CF6 /* ALCustomSearchBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ALCustomSearchBar.swift; path = Applozic/ALCustomSearchBar.swift; sourceTree = "<group>"; };
 		18A2B2B1228A12C500CE93BC /* ALInternalSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ALInternalSettings.h; path = Applozic/ALInternalSettings.h; sourceTree = "<group>"; };
 		18A2B2B2228A12C600CE93BC /* ALInternalSettings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ALInternalSettings.m; path = Applozic/ALInternalSettings.m; sourceTree = "<group>"; };
 		18A2B2B5228A14B000CE93BC /* ALTabViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ALTabViewController.h; path = Applozic/ViewControllers/ALTabViewController.h; sourceTree = "<group>"; };
@@ -996,6 +1004,8 @@
 		6D6DF0731BC535C800EBA00F = {
 			isa = PBXGroup;
 			children = (
+				18A0E9B724D2189500AE9CF6 /* ALCustomSearchBar.swift */,
+				18A0E9B524D2165000AE9CF6 /* ALSearchViewModel.swift */,
 				18C926E0249BC3EA00232576 /* ALJWT.swift */,
 				18C926E1249BC3EA00232576 /* ALJWTDecode.swift */,
 				18A583C0246469C7008F2089 /* SecureStore.swift */,
@@ -1090,6 +1100,8 @@
 		6D6DF0A71BC5364C00EBA00F /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
+				18A0E9B224D2163500AE9CF6 /* ALSearchResultViewController.h */,
+				18A0E9B124D2163500AE9CF6 /* ALSearchResultViewController.m */,
 				187EEAA823182396008012BC /* ALImagePreviewController.h */,
 				187EEAA723182396008012BC /* ALPreviewPhotoViewController.swift */,
 				1866E32D218749C900667018 /* ALImagePreviewController.m */,
@@ -1753,6 +1765,7 @@
 				6D7756D71D5B82000025560B /* ALMessageInfoResponse.h in Headers */,
 				6D4FE48F1D7411F70044A7E6 /* NSData+AES.h in Headers */,
 				6D7756AB1D5B80DF0025560B /* ALChannelClientService.h in Headers */,
+				18A0E9B424D2163500AE9CF6 /* ALSearchResultViewController.h in Headers */,
 				29CBF2021C0303A700BE6A20 /* ALColorUtility.h in Headers */,
 				18D29D4722610DBE009C4D39 /* ForegroundReconnection.h in Headers */,
 				6D3A4E051C76ED6C0067A4C8 /* ALAudioAttachmentViewController.h in Headers */,
@@ -2113,6 +2126,7 @@
 				6D6DF1D61BC5364C00EBA00F /* TPPropertyAnimation.m in Sources */,
 				6D7757241D5B83AA0025560B /* ALHyperLabel.m in Sources */,
 				4612E90E1E13882D0022DB23 /* MQTTSessionSynchron.m in Sources */,
+				18A0E9B824D2189600AE9CF6 /* ALCustomSearchBar.swift in Sources */,
 				6D6DF17F1BC5364C00EBA00F /* ALUser.m in Sources */,
 				4612E9161E13882D0022DB23 /* MQTTSSLSecurityPolicyTransport.m in Sources */,
 				8B7864221FE2329F004B9E64 /* MessageReplyView.m in Sources */,
@@ -2128,6 +2142,7 @@
 				C76D314D1F0AAFCF0087291F /* ALAudioVideoBaseVC.m in Sources */,
 				6D7756D81D5B82000025560B /* ALMessageInfoResponse.m in Sources */,
 				18C926EB249BC40500232576 /* ALAuthService.m in Sources */,
+				18A0E9B624D2165000AE9CF6 /* ALSearchViewModel.swift in Sources */,
 				6D7757361D5B84BE0025560B /* ALUIConstant.m in Sources */,
 				1A113F0021C00AE10000A7CC /* ALAudioRecordButton.swift in Sources */,
 				C70273CC1DED445E00BA2C8A /* ALUserDetailListFeed.m in Sources */,
@@ -2150,6 +2165,7 @@
 				6D6DF1551BC5364C00EBA00F /* UIImage+Utility.m in Sources */,
 				6D46B6C61BD025060014A5D3 /* ALMapViewController.m in Sources */,
 				18D29D732261111E009C4D39 /* ALUploadTask.m in Sources */,
+				18A0E9B324D2163500AE9CF6 /* ALSearchResultViewController.m in Sources */,
 				6DEAEE8D1D4CDBC700360060 /* ALUserProfileVC.m in Sources */,
 				6D6DF1531BC5364C00EBA00F /* ALUtilityClass.m in Sources */,
 				294637B71C6F16050025ED76 /* ALGroupCreationViewController.m in Sources */,

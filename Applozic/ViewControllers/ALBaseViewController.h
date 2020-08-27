@@ -28,6 +28,8 @@
 @property (nonatomic, strong) NSArray * wordArray;
 @property (strong, nonatomic) UIBarButtonItem * callButton;
 @property (strong, nonatomic) UIBarButtonItem * closeButton;
+@property (assign, nonatomic) CGFloat extraBottom;
+@property (assign, nonatomic) BOOL isExtraKeyboardUpcomingIphone5;
 
 @property (strong, nonatomic) NSMutableArray <UIBarButtonItem *> * navRightBarButtonItems;
 

@@ -194,7 +194,8 @@ static NSString *const DEFAULT_FONT_NAME = @"Helvetica-Bold";
     
     NSString * receiverName = [alContact getDisplayName];
     
-    CGSize theTextSize = [ALUtilityClass getSizeForText:alMessage.message maxWidth:viewSize.width-115
+    CGFloat despite = ([alMessage.type isEqualToString:AL_IN_BOX]) ? 90 : 125;
+    CGSize theTextSize = [ALUtilityClass getSizeForText:alMessage.message maxWidth:viewSize.width-despite
                                                    font:self.mMessageLabel.font.fontName
                                                fontSize:self.mMessageLabel.font.pointSize];
     
@@ -202,8 +203,12 @@ static NSString *const DEFAULT_FONT_NAME = @"Helvetica-Bold";
                                                    font:self.mDateLabel.font.fontName
                                                fontSize:self.mDateLabel.font.pointSize];
     
+    if (receiverName.length > 22) {
+        receiverName = [receiverName substringToIndex:21];
+    }
+    CGFloat maxNameWidth = viewSize.width - theDateSize.width - DATE_PADDING_X * 3 - USER_PROFILE_WIDTH - USER_PROFILE_PADDING_X * 2;
     CGSize receiverNameSize = [ALUtilityClass getSizeForText:receiverName
-                                                    maxWidth:viewSize.width - 115
+                                                    maxWidth:maxNameWidth
                                                         font:self.mChannelMemberName.font.fontName
                                                     fontSize:self.mChannelMemberName.font.pointSize];
     
@@ -245,6 +250,10 @@ static NSString *const DEFAULT_FONT_NAME = @"Helvetica-Bold";
             self.mBubleImageView.backgroundColor = [UIColor whiteColor];
         }
         
+        CGFloat topWidth = receiverNameSize.width + theDateSize.width + DATE_PADDING_X;
+        if (topWidth > theTextSize.width /* && topWidth < viewSize.width - self.mUserProfileImageView.frame.size.width - DATE_PADDING_X * 2 */) {
+            theTextSize.width = topWidth;
+        }
         self.mNameLabel.frame = self.mUserProfileImageView.frame;
         [self.mNameLabel setText:[ALColorUtility getAlphabetForProfileImage:receiverName]];
         
@@ -280,7 +289,7 @@ static NSString *const DEFAULT_FONT_NAME = @"Helvetica-Bold";
             
             self.mChannelMemberName.frame = CGRectMake(self.mBubleImageView.frame.origin.x + CHANNEL_PADDING_X,
                                                        self.mBubleImageView.frame.origin.y + CHANNEL_PADDING_Y,
-                                                       (self.mBubleImageView.frame.size.width)+ CHANNEL_PADDING_WIDTH, CHANNEL_PADDING_HEIGHT);
+                                                       receiverNameSize.width, CHANNEL_PADDING_HEIGHT);
             
             [self.mChannelMemberName setText:receiverName];
             
@@ -318,9 +327,6 @@ static NSString *const DEFAULT_FONT_NAME = @"Helvetica-Bold";
         
         self.mMessageLabel.textColor = [ALApplozicSettings getReceiveMsgTextColor];
         
-        self.mDateLabel.frame = CGRectMake(self.mBubleImageView.frame.origin.x,
-                                           self.mBubleImageView.frame.origin.y + self.mBubleImageView.frame.size.height,
-                                           theDateSize.width + DATE_PADDING_WIDTH, DATE_HEIGHT);
         
         self.mDateLabel.textAlignment = NSTextAlignmentLeft;
 
@@ -329,8 +335,12 @@ static NSString *const DEFAULT_FONT_NAME = @"Helvetica-Bold";
 
             self.mChannelMemberName.frame = CGRectMake(self.mBubleImageView.frame.origin.x + CHANNEL_PADDING_X,
                                                        self.mBubleImageView.frame.origin.y + CHANNEL_PADDING_Y,
-                                                       (self.mBubleImageView.frame.size.width -10), CHANNEL_PADDING_HEIGHT);
+                                                       receiverNameSize.width, CHANNEL_PADDING_HEIGHT);
         }
+        
+        self.mDateLabel.frame = CGRectMake(self.mChannelMemberName.frame.origin.x + self.mChannelMemberName.frame.size.width + 10 ,
+        self.mChannelMemberName.frame.origin.y + 2,
+        theDateSize.width + DATE_PADDING_WIDTH, DATE_HEIGHT);
 
         if(alContact.contactImageUrl)
         {
@@ -397,10 +407,10 @@ static NSString *const DEFAULT_FONT_NAME = @"Helvetica-Bold";
         self.mMessageLabel.frame = CGRectMake(self.mBubleImageView.frame.origin.x + MESSAGE_PADDING_X,
                                               mMessageLabelY, theTextSize.width, theTextSize.height);
         
-        self.mDateLabel.frame = CGRectMake((self.mBubleImageView.frame.origin.x + self.mBubleImageView.frame.size.width)
-                                           - theDateSize.width - DATE_PADDING_X,
-                                           self.mBubleImageView.frame.origin.y + self.mBubleImageView.frame.size.height,
-                                           theDateSize.width, DATE_HEIGHT);
+        self.mDateLabel.frame = CGRectMake((self.mBubleImageView.frame.origin.x)
+        - theDateSize.width - DATE_PADDING_X,
+        self.mBubleImageView.frame.origin.y /*+ self.mBubleImageView.frame.size.height*/,
+        theDateSize.width, DATE_HEIGHT);
         
         
         self.mDateLabel.textAlignment = NSTextAlignmentLeft;
@@ -498,13 +508,15 @@ static NSString *const DEFAULT_FONT_NAME = @"Helvetica-Bold";
 
     if ([self.mMessage.type isEqualToString:AL_IN_BOX]){
 
-        [[UIMenuController sharedMenuController] setMenuItems: @[messageForward,messageReply]];
+//        [[UIMenuController sharedMenuController] setMenuItems: @[messageForward,messageReply]];
+        [[UIMenuController sharedMenuController] setMenuItems: @[messageForward]];
 
     }else if ([self.mMessage.type isEqualToString:AL_OUT_BOX]){
 
         UIMenuItem * msgInfo = [[UIMenuItem alloc] initWithTitle:NSLocalizedStringWithDefaultValue(@"infoOptionTitle", [ALApplozicSettings getLocalizableName],[NSBundle mainBundle], @"Info", @"") action:@selector(msgInfo:)];
 
-        [[UIMenuController sharedMenuController] setMenuItems: @[msgInfo,messageReply,messageForward]];
+//        [[UIMenuController sharedMenuController] setMenuItems: @[msgInfo,messageReply,messageForward]];
+        [[UIMenuController sharedMenuController] setMenuItems: @[msgInfo,messageForward]];
     }
        [[UIMenuController sharedMenuController] update];
 
@@ -546,12 +558,12 @@ static NSString *const DEFAULT_FONT_NAME = @"Helvetica-Bold";
     
     if([self.mMessage isSentMessage] && self.mMessage.groupId)
     {
-        return (self.mMessage.isDownloadRequired? (action == @selector(delete:) || action == @selector(msgInfo:) || action == @selector(copy:)) : (action == @selector(delete:)|| action == @selector(msgInfo:)|| [self isForwardMenuEnabled:action]  || [self isMessageReplyMenuEnabled:action] || action == @selector(copy:)));
+//        return (self.mMessage.isDownloadRequired? (action == @selector(delete:) || action == @selector(msgInfo:) || action == @selector(copy:)) : (action == @selector(delete:)|| action == @selector(msgInfo:)|| [self isForwardMenuEnabled:action]  || [self isMessageReplyMenuEnabled:action] || action == @selector(copy:)));
+        return (self.mMessage.isDownloadRequired? (action == @selector(msgInfo:) || action == @selector(copy:)) : (action == @selector(msgInfo:)|| [self isForwardMenuEnabled:action]  || [self isMessageReplyMenuEnabled:action] || action == @selector(copy:)));
     }
     
-    return (self.mMessage.isDownloadRequired? (action == @selector(delete:)):(action == @selector(delete:) ||[self isForwardMenuEnabled:action]|| [self isMessageReplyMenuEnabled:action] )|| (action == @selector(copy:)));
-    
-    
+//    return (self.mMessage.isDownloadRequired? (action == @selector(delete:)):(action == @selector(delete:) ||[self isForwardMenuEnabled:action]|| [self isMessageReplyMenuEnabled:action] )|| (action == @selector(copy:)));
+    return [self isForwardMenuEnabled:action]|| [self isMessageReplyMenuEnabled:action] || (action == @selector(copy:));
 }
 
 

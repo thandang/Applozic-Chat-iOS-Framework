@@ -138,6 +138,7 @@ ALSoundRecorderProtocol, ALCustomPickerDelegate,ALImageSendDelegate,UIDocumentPi
 @property (nonatomic) BOOL isUserBlocked;
 @property (nonatomic) BOOL isUserBlockedBy;
 @property (nonatomic, strong) ALLoadingIndicator *loadingIndicator;
+@property (nonatomic, assign) BOOL sendKeyPressed;
 
 -(void)processAttachment:(NSString *)filePath andMessageText:(NSString *)textwithimage andContentType:(short)contentype;
 
@@ -196,10 +197,20 @@ ALSoundRecorderProtocol, ALCustomPickerDelegate,ALImageSendDelegate,UIDocumentPi
         isAudioRecordingEnabled = YES;
     }
 
+    self.typingMessageView.layer.cornerRadius = 27.0;
+    self.typingMessageView.layer.borderColor = [UIColor colorWithRed:13.0/255 green:122.0/255 blue:152.0/255 alpha:0.5].CGColor;
+    self.typingMessageView.layer.borderWidth = 1;
+    self.typingMessageView.backgroundColor = UIColor.clearColor;
+    
+    self.sendMessageTextView.returnKeyType = UIReturnKeySend;
+    
     [self initialSetUp];
-    self.placeHolderTxt = NSLocalizedStringWithDefaultValue(@"placeHolderText", [ALApplozicSettings getLocalizableName], [NSBundle mainBundle], @"Write a Message...", @"");
+    self.placeHolderTxt = NSLocalizedStringWithDefaultValue(@"placeHolderText", [ALApplozicSettings getLocalizableName], [NSBundle mainBundle], @"Text Here...", @"");
     self.sendMessageTextView.text = self.placeHolderTxt;
-    self.defaultMessageViewHeight = 56.0;
+    if (self.defaultMessageViewHeight == 0) {
+        self.defaultMessageViewHeight = 56.0;
+    }
+    self.typingMessageView.clipsToBounds = true;
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateVOIPMsg)
                                                  name:@"UPDATE_VOIP_MSG" object:nil];
@@ -207,7 +218,8 @@ ALSoundRecorderProtocol, ALCustomPickerDelegate,ALImageSendDelegate,UIDocumentPi
     [self.attachmentOutlet setTintColor:[ALApplozicSettings getAttachmentIconColour]];
     [self.sendButton setTintColor:[ALApplozicSettings getSendIconColour]];
     self.alphabetiColorCodesDictionary = [ALApplozicSettings getUserIconFirstNameColorCodes];
-
+    self.typingLabel.text = @"";
+    self.sendKeyPressed = false;
 }
 
 -(void)viewDidAppear:(BOOL)animated
@@ -340,7 +352,8 @@ ALSoundRecorderProtocol, ALCustomPickerDelegate,ALImageSendDelegate,UIDocumentPi
 
     if(self.text && !self.alMessageWrapper.getUpdatedMessageArray.count)
     {
-        [self.sendMessageTextView setTextColor:[ALApplozicSettings getTextColorForMessageTextView]];
+//        [self.sendMessageTextView setTextColor:[ALApplozicSettings getTextColorForMessageTextView]];
+        [self.sendMessageTextView setTextColor:[UIColor blackColor]];
         self.sendMessageTextView.text = self.text;
     }
     else if ([self.sendMessageTextView.text isEqualToString:@""])
@@ -612,7 +625,7 @@ ALSoundRecorderProtocol, ALCustomPickerDelegate,ALImageSendDelegate,UIDocumentPi
     if(![self.alMessageWrapper getUpdatedMessageArray].count && [ALApplozicSettings getVisibilityNoConversationLabelChatVC])
     {
         [self.noConLabel setText:[ALApplozicSettings getEmptyConversationText]];
-        [self.noConLabel setHidden:NO];
+//        [self.noConLabel setHidden:NO];
 
         return;
     }
@@ -1505,10 +1518,10 @@ ALSoundRecorderProtocol, ALCustomPickerDelegate,ALImageSendDelegate,UIDocumentPi
 
 -(void)postMessage
 {
-
-    if(isMicButtonVisible) {
-        return;
-    }
+//Disable mic action
+//    if(isMicButtonVisible) {
+//        return;
+//    }
 
     if(self.isUserBlocked)
     {
@@ -1570,9 +1583,10 @@ ALSoundRecorderProtocol, ALCustomPickerDelegate,ALImageSendDelegate,UIDocumentPi
 
 - (IBAction)sendAction:(id)sender
 {
-    if(isMicButtonVisible) {
-        [soundRecording show];
-    }
+    //Disable mic action
+//    if(isMicButtonVisible) {
+//        [soundRecording show];
+//    }
     [super sendAction:sender];
 }
 
@@ -3691,7 +3705,7 @@ ALSoundRecorderProtocol, ALCustomPickerDelegate,ALImageSendDelegate,UIDocumentPi
         [self.sendMessageTextView setText:self.placeHolderTxt];
         [self.sendMessageTextView setTextColor:self.placeHolderColor];
     } else if (![self.sendMessageTextView isFirstResponder]) {
-        self.placeHolderTxt = NSLocalizedStringWithDefaultValue(@"placeHolderText", [ALApplozicSettings getLocalizableName], [NSBundle mainBundle], @"Write a Message...", @"");
+        self.placeHolderTxt = NSLocalizedStringWithDefaultValue(@"placeHolderText", [ALApplozicSettings getLocalizableName], [NSBundle mainBundle], @"Text here...", @"");
         [self.sendMessageTextView setText:self.placeHolderTxt];
         [self.sendMessageTextView setTextColor:self.placeHolderColor];
     }
@@ -3907,12 +3921,31 @@ ALSoundRecorderProtocol, ALCustomPickerDelegate,ALImageSendDelegate,UIDocumentPi
 #pragma TEXT VIEW DELEGATE + PLUS HELPER METHODS
 //==============================================================================================================================================
 
+- (BOOL) textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text {
+    if ([text isEqualToString:@"\n"]) {
+        //TODO: Handle send
+        self.sendKeyPressed = true;
+        [self postMessage];
+        NSLog(@"enter from message");
+        self.textMessageViewHeightConstaint.constant = self.defaultMessageViewHeight; //Reset input height
+
+        [textView setScrollEnabled:NO];
+        [UIView animateWithDuration:0.4 animations:^{
+            [super setHeightOfTextViewDynamically:YES];
+        }];
+
+        return false;
+    }
+    return true;
+}
+
 -(void)textViewDidBeginEditing:(UITextView *)textView
 {
 
     if ([textView.text isEqualToString:self.placeHolderTxt])
     {
-        [self placeHolder:@"" andTextColor:[ALApplozicSettings getTextColorForMessageTextView]];
+//        [self placeHolder:@"" andTextColor:[ALApplozicSettings getTextColorForMessageTextView]];
+        [self placeHolder:@"" andTextColor:[UIColor whiteColor]];
     }
 }
 
@@ -4001,6 +4034,10 @@ ALSoundRecorderProtocol, ALCustomPickerDelegate,ALImageSendDelegate,UIDocumentPi
 
 -(void)subProcessTextViewDidChange:(UITextView *)textView
 {
+    if (self.sendKeyPressed) { //If Send key is pressed, then just send without increase
+        self.sendKeyPressed = false; //reset send key press flag
+        return;
+    }
     CGRect textSize = [self sizeOfText:textView.text widthOfTextView:self.sendMessageTextView.textContainer.size.width
                               withFont:[UIFont fontWithName:[ALApplozicSettings getFontFace] size:textView.font.pointSize]];
 
@@ -4021,7 +4058,7 @@ ALSoundRecorderProtocol, ALCustomPickerDelegate,ALImageSendDelegate,UIDocumentPi
         [super setHeightOfTextViewDynamically];
         //        NSLog(@"CASE EMPTY");
     }
-    else if(textSize.size.height <= maxHeight.size.height)  //&& [self isNewLine:textView]
+    else if(textSize.size.height < maxHeight.size.height)  //&& [self isNewLine:textView]
     {
         //Untill max rows are achieved than SCROLL
         [textView setScrollEnabled:NO];
@@ -4036,7 +4073,15 @@ ALSoundRecorderProtocol, ALCustomPickerDelegate,ALImageSendDelegate,UIDocumentPi
         if(self.sendMessageTextView.frame.size.height < maxHeight.size.height)
         {
             //  NSLog(@"MAX HIGHT");
-            self.textMessageViewHeightConstaint.constant = TEXT_VIEW_TO_MESSAGE_VIEW_RATIO * maxHeight.size.height;
+            CGFloat textConstaint = TEXT_VIEW_TO_MESSAGE_VIEW_RATIO * maxHeight.size.height;;
+            if (textConstaint < 50) {
+                textConstaint = 50.0;
+            }
+            self.textMessageViewHeightConstaint.constant = textConstaint;
+            
+            if (self.textViewHeightConstraint.constant > self.textMessageViewHeightConstaint.constant) {
+                self.textViewHeightConstraint.constant = TEXT_VIEW_TO_MESSAGE_VIEW_RATIO * maxHeight.size.height - 4;
+            }
         }
         [textView setScrollEnabled:YES];
         //        NSLog(@"CASE SCROLL");
@@ -4409,29 +4454,30 @@ ALSoundRecorderProtocol, ALCustomPickerDelegate,ALImageSendDelegate,UIDocumentPi
 
 -(void)openUserChatOnTap:(NSString *)userId
 {
-    [[NSNotificationCenter defaultCenter]
-     postNotificationName:ThirdPartyProfileTapNotification
-     object:nil
-     userInfo:@{ThirdPartyDetailVCNotificationNavigationVC : self.navigationController,
-                ThirdPartyDetailVCNotificationALContact : userId}
-     ];
-    BOOL tapFlag = ([ALApplozicSettings isChatOnTapUserProfile] && [self isGroup]);
-
-    if (!tapFlag)
-    {
-        return;
-    }
-
-    [UIView transitionWithView:self.view duration:0.1
-                       options:UIViewAnimationOptionTransitionNone
-                    animations:^{
-
-        self.channelKey = nil;
-        self.contactIds = userId;
-        self.conversationId = nil;
-        [self updateConversationProfileDetails];
-        [self prepareViewController];
-    } completion:nil];
+    //We are not allow to open user profile on chat upon scope of project
+//    [[NSNotificationCenter defaultCenter]
+//     postNotificationName:ThirdPartyProfileTapNotification
+//     object:nil
+//     userInfo:@{ThirdPartyDetailVCNotificationNavigationVC : self.navigationController,
+//                ThirdPartyDetailVCNotificationALContact : userId}
+//     ];
+//    BOOL tapFlag = ([ALApplozicSettings isChatOnTapUserProfile] && [self isGroup]);
+//
+//    if (!tapFlag)
+//    {
+//        return;
+//    }
+//
+//    [UIView transitionWithView:self.view duration:0.1
+//                       options:UIViewAnimationOptionTransitionNone
+//                    animations:^{
+//
+//        self.channelKey = nil;
+//        self.contactIds = userId;
+//        self.conversationId = nil;
+//        [self updateConversationProfileDetails];
+//        [self prepareViewController];
+//    } completion:nil];
 }
 
 -(void)openUserChat:(ALMessage *)alMessage
@@ -4473,7 +4519,7 @@ ALSoundRecorderProtocol, ALCustomPickerDelegate,ALImageSendDelegate,UIDocumentPi
 {
 
     self.viewHeightConstraints.constant=50;
-    self.messageReplyView.hidden =0;
+//    self.messageReplyView.hidden =0; //We're not allow to reply in case of scope
     if([ALApplozicSettings isTemplateMessageEnabled]) {
         [templateMessageView setHidden:YES];
     }
@@ -4752,7 +4798,8 @@ ALSoundRecorderProtocol, ALCustomPickerDelegate,ALImageSendDelegate,UIDocumentPi
 }
 
 -(void) startRecordingAudio {
-    [soundRecording show];
+    //Disable sounds record in this scope
+//    [soundRecording show];
 }
 
 -(void) cancelRecordingAudio {

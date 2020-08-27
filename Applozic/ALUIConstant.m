@@ -24,8 +24,9 @@
 
 +(CGSize)textSize:(ALMessage *)theMessage andCellFrame:(CGRect)cellFrame
 {
+    CGFloat despite = theMessage.isReceivedMessage ? 90 : 125;//([theMessage.type
     CGSize theTextSize = [ALUtilityClass getSizeForText:theMessage.message
-                                               maxWidth:cellFrame.size.width - 115
+                                               maxWidth:cellFrame.size.width - despite
                                                    font:[ALApplozicSettings getFontFace]
                                                fontSize:[ALApplozicSettings getChatCellTextFontSize]];
     
@@ -124,9 +125,11 @@
 +(CGFloat)getChatCellHeight:(ALMessage *)alMessage andCellFrame:(CGRect)cellFrame  // NEED CHECK AGAIN TEXT CELL
 {
     CGSize theTextSize = [self textSize:alMessage andCellFrame:cellFrame];
-    CGFloat HEIGHT = theTextSize.height + 70;
-    
-    return HEIGHT;
+    if ([alMessage.type isEqualToString:@"5"]) {
+        return theTextSize.height + 32;
+    } else {
+        return theTextSize.height + 52;
+    }
 }
 
 +(CGFloat)getCustomChatCellHeight:(ALMessage *)alMessage andCellFrame:(CGRect)cellFrame

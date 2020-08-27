@@ -73,14 +73,14 @@
     NSString *theParamString = [[NSString alloc] initWithData:postdata encoding:NSUTF8StringEncoding];
 
     NSString *logParamText = [self getUserParamTextForLogging:user];
-    ALSLog(ALLoggerSeverityInfo, @"PARAM_STRING USER_REGISTRATION :: %@",logParamText);
+//    ALSLog(ALLoggerSeverityInfo, @"PARAM_STRING USER_REGISTRATION :: %@",logParamText);
 
     NSMutableURLRequest * theRequest = [ALRequestHandler createPOSTRequestWithUrlString:theUrlString paramString:theParamString];
 
     [ALResponseHandler processRequest:theRequest andTag:@"CREATE ACCOUNT" WithCompletionHandler:^(id theJson, NSError *theError) {
         
         NSString *statusStr = (NSString *)theJson;
-        ALSLog(ALLoggerSeverityInfo, @"RESPONSE_USER_REGISTRATION :: %@", statusStr);
+//        ALSLog(ALLoggerSeverityInfo, @"RESPONSE_USER_REGISTRATION :: %@", statusStr);
         
         if (theError) {
             completion(nil, theError);

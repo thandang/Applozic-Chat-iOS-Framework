@@ -9,6 +9,7 @@
 static CGFloat NAVIGATION_TEXT_SIZE = 20;
 static CGFloat LAST_SEEN_LABEL_SIZE = 10;
 static CGFloat TYPING_LABEL_SIZE = 12.5;
+static CGFloat KEYBOARD_PADDING = 85;
 
 #import "ALBaseViewController.h"
 #import "ALUtilityClass.h"
@@ -20,6 +21,8 @@ static CGFloat TYPING_LABEL_SIZE = 12.5;
 #import "ALNavigationController.h"
 #import "ALApplicationInfo.h"
 #import "ALRegisterUserClientService.h"
+
+
 
 static CGFloat const sendTextViewCornerRadius = 15.0f;
 
@@ -315,29 +318,68 @@ static CGFloat const sendTextViewCornerRadius = 15.0f;
 #pragma mark - Keyboard Post Notifacations
 //------------------------------------------------------------------------------------------------------------------
 
+- (BOOL) isLandscape {
+    if (UIDeviceOrientationIsValidInterfaceOrientation([[UIDevice currentDevice] orientation])) {
+        return  UIDeviceOrientationIsLandscape([[UIDevice currentDevice] orientation]);
+    } else {
+        return UIInterfaceOrientationIsLandscape([[UIApplication sharedApplication] statusBarOrientation]);
+    }
+}
+
+- (BOOL) isIPhoneX {
+    CGFloat frameHeight = [[UIScreen mainScreen] nativeBounds].size.height;
+    CGFloat frameWidth = [[UIScreen mainScreen] nativeBounds].size.width;
+    frameHeight = (frameHeight > frameWidth) ? frameHeight : frameWidth;
+    if (frameHeight == 2436 || frameHeight == 2688 || frameHeight == 1792) {
+        return true;
+    }
+    return false;
+}
+
 -(void) keyBoardWillShow:(NSNotification *) notification
 {
-    NSString * theAnimationDuration = [self handleKeyboardNotification:notification];
-
-    self.checkBottomConstraint.constant = -1 * keyboardEndFrame.size.height +
-    self.bottomLayoutGuide.length;
-
-    [UIView animateWithDuration:theAnimationDuration.doubleValue animations:^{
-        [self.view layoutIfNeeded];
-        [self scrollTableViewToBottomWithAnimation:YES];
-    } completion:^(BOOL finished) {
-        if (finished) {
-            [self scrollTableViewToBottomWithAnimation:YES];
+    CGFloat copyExtra = self.extraBottom;
+    if (![self isLandscape]) {
+        copyExtra = 0; //reset on portraint
+    }
+    if ([self isLandscape]) { //Only handle on landscape
+        NSString * theAnimationDuration = [self handleKeyboardNotification:notification];
+        if ([self isIPhoneX]) {
+            copyExtra = -25;
+        } else {
+            copyExtra = -15;
         }
-    }];
+        if (@available(iOS 11.0, *)) {
+            self.checkBottomConstraint.constant = -(self.view.frame.size.height - keyboardEndFrame.origin.y + navigationWidth - self.view.safeAreaInsets.bottom + copyExtra);
+        } else {
+            // Fallback on earlier versions
+            self.checkBottomConstraint.constant = -(self.view.frame.size.height - keyboardEndFrame.origin.y + navigationWidth + copyExtra);
+        }
+        NSLog(@"current bottom constant: %f", self.checkBottomConstraint.constant);
+        [UIView animateWithDuration:theAnimationDuration.doubleValue animations:^{
+            [self.view layoutIfNeeded];
+            [self scrollTableViewToBottomWithAnimation:YES];
+        } completion:^(BOOL finished) {
+            if (finished) {
+                [self scrollTableViewToBottomWithAnimation:YES];
+            }
+        }];
+    }
 }
 
 -(void) keyBoardWillHide:(NSNotification *) notification
 {
     NSString * theAnimationDuration = [self handleKeyboardNotification:notification];
     
-    self.checkBottomConstraint.constant = 0;
-//    self.noConversationLabel.frame = tempFrame;
+     if ([self isLandscape]) { //Only handle on landscape
+           if ([self isIPhoneX]) {
+               self.checkBottomConstraint.constant = 15;
+           } else {
+               self.checkBottomConstraint.constant = 0;
+           }
+       } else {
+           self.checkBottomConstraint.constant = 0;
+       }
     
     [UIView animateWithDuration:theAnimationDuration.doubleValue animations:^{
         [self.view layoutIfNeeded];
@@ -384,7 +426,16 @@ static CGFloat const sendTextViewCornerRadius = 15.0f;
     CGSize sizeThatFitsTextView = [self.sendMessageTextView sizeThatFits:CGSizeMake(self.sendMessageTextView.frame.size.width, self.sendMessageTextView.frame.size.height)];
     self.textViewHeightConstraint.constant =  sizeThatFitsTextView.height;
     
-    self.textMessageViewHeightConstaint.constant = (self.typingMessageView.frame.size.height-self.sendMessageTextView.frame.size.height) + sizeThatFitsTextView.height + paddingForTextMessageViewHeight;
+    CGFloat textConstaint = (self.typingMessageView.frame.size.height-self.sendMessageTextView.frame.size.height) + sizeThatFitsTextView.height + paddingForTextMessageViewHeight;
+    if (textConstaint < 50) {
+        textConstaint = 50.0;
+    }
+    
+    //Text extra content on iPhone 5, upcoming event while long text
+    if (self.isExtraKeyboardUpcomingIphone5 && textConstaint > 90) {
+        textConstaint = 71.5;
+    }
+    self.textMessageViewHeightConstaint.constant = textConstaint;
 }
 
 -(void) scrollTableViewToBottomWithAnimation:(BOOL) animated {
